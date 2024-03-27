@@ -52,7 +52,7 @@ func realMain() error {
 	mux := router.NewRouter(todoDB)
 
 	// TODO: サーバーをlistenする
-	log.Fatal(http.ListenAndServe(port, mux))
+	http.ListenAndServe(port, mux)
 
 	return nil
 }
