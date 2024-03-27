@@ -71,6 +71,9 @@ func (h *TODOHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 		}	
+		return
+	case http.MethodGet:
+		
 	}
 }
 
