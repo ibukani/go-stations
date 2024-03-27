@@ -54,7 +54,6 @@ func TestStation12(t *testing.T) {
 		t.Errorf("todoの追加に失敗しました: %v", err)
 		return
 	}
-
 	testcases := map[string]struct {
 		ID          int64
 		Subject     string

@@ -39,8 +39,8 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 	row := s.db.QueryRowContext(ctx, confirm, id)
 
 	var todo model.TODO
-	todo.ID = int(id)
-	err = row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
+	todo.ID = id
+	err = row.Scan(&todo.ID, &todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
 	
 	return &todo, err
 }
@@ -74,8 +74,13 @@ func (s *TODOService) UpdateTODO(ctx context.Context, id int64, subject, descrip
 	if rows == 0 {
 		return nil, &model.ErrNotFound{}
 	}
+	row := s.db.QueryRowContext(ctx, confirm, id)
 
-	return nil, nil
+	var todo model.TODO
+	todo.ID = id
+	err = row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
+
+	return &todo, err
 }
 
 // DeleteTODO deletes TODOs on DB by ids.
