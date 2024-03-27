@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/TechBowl-japan/go-stations/model"
 )
@@ -25,8 +26,23 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 		insert  = `INSERT INTO todos(subject, description) VALUES(?, ?)`
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
+	result, err := s.db.ExecContext(ctx, insert, subject, description)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	row := s.db.QueryRowContext(ctx, confirm, id)
 
-	return nil, nil
+	var todo model.TODO
+	todo.ID = int(id)
+	err = row.Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
+	
+	return &todo, err
 }
 
 // ReadTODO reads TODOs on DB.
@@ -45,6 +61,19 @@ func (s *TODOService) UpdateTODO(ctx context.Context, id int64, subject, descrip
 		update  = `UPDATE todos SET subject = ?, description = ? WHERE id = ?`
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
+	result, err := s.db.ExecContext(ctx, update, subject, description, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if rows == 0 {
+		return nil, &model.ErrNotFound{}
+	}
 
 	return nil, nil
 }
